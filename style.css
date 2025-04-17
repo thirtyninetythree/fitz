@@ -1,0 +1,70 @@
+/* Container for image and indicator */
+.image-replacer-container {
+    position: relative; /* Crucial for positioning the absolute indicator */
+    display: inline-block; /* Wraps the image size */
+    line-height: 0; /* Prevents potential extra space below the image */
+    vertical-align: bottom; /* Or adjust as needed based on page layout */
+    /* Add transition for smoother hover effects if desired */
+    /* transition: box-shadow 0.2s ease-in-out; */
+  }
+  
+  /* Style the image inside the container */
+  .image-replacer-container img {
+    display: block; /* Prevents extra space inside container */
+    /* max-width: 100%; */ /* Uncomment if you want images to scale down if container is constrained */
+    /* height: auto; */   /* Uncomment if using max-width */
+    border: 2px solid transparent; /* Reserve space for hover border */
+    box-sizing: border-box; /* Include border in element's total width/height */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  /* Corner indicator button */
+  .image-replacer-indicator {
+    position: absolute;
+    top: 8px;    /* Adjust position as needed */
+    right: 8px;   /* Adjust position as needed */
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10001; /* Ensure it's above most page content */
+    pointer-events: auto; /* Make it clickable */
+    cursor: pointer;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease-in-out;
+    font-size: 18px; /* Adjust emoji size */
+    color: #333;
+  }
+  
+  /* Show indicator and apply image border on container hover */
+  .image-replacer-container.container-hover .image-replacer-indicator {
+    opacity: 1;
+  }
+  
+  .image-replacer-container.container-hover img {
+    border-color: #4285f4; /* Blue border on hover */
+    box-shadow: 0 0 8px rgba(66, 133, 244, 0.5);
+  }
+  
+  /* Optional: Specific styles for loading/success states */
+  .image-replacer-indicator.indicator-loading {
+    cursor: progress;
+    /* Add spin animation if desired */
+  }
+  
+  .image-replacer-indicator.indicator-success {
+    background-color: rgba(40, 167, 69, 0.9); /* Green background for success */
+    color: white;
+  }
+  
+  /* Inner div holding the emoji/icon - adjust styles if needed */
+  .image-replacer-btn {
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
