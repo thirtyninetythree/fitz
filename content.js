@@ -1,8 +1,6 @@
 // Global flag to track if the extension is active on the current page
 let isExtensionActive = true; // Default to true, will be updated from storage
 
-console.log('Steal this look content script loaded');
-
 /**
  * Applies the hover effects, wrapper, and indicator button to a single image element.
  * @param {HTMLImageElement} img - The image element to process.
@@ -13,7 +11,7 @@ function applyEffectsToImage(img) {
     const imgWidth = img.offsetWidth || img.naturalWidth;
     const imgHeight = img.offsetHeight || img.naturalHeight;
 
-    if (imgWidth < 30 || imgHeight < 30) {
+    if (imgWidth < 50 || imgHeight < 50) {
         // console.log('Skipping small image:', img.src, imgWidth, 'x', imgHeight);
         return;
     }
@@ -21,6 +19,12 @@ function applyEffectsToImage(img) {
     // Skip images that already have our wrapper/marker
     if (img.classList.contains('image-replacer-ready') || img.closest('.image-replacer-container')) {
         // console.log('Skipping already processed image:', img.src);
+        return;
+    }
+
+     // Skip images that are inside links
+     if (img.closest('a[href]')) {
+        console.log('Skipping linked image:', img.src);
         return;
     }
 
@@ -42,6 +46,7 @@ function applyEffectsToImage(img) {
         img.parentNode.insertBefore(container, img);
         container.appendChild(img); // Move image into container
         container.appendChild(indicator); // Add indicator into container
+
     } catch (e) {
         console.error('Failed to wrap image:', img.src, e);
         return; // Stop processing this image if wrapping failed

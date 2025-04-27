@@ -43,30 +43,36 @@ async function processImageWithGemini(imageUrl) {
         // First, we need to fetch the image and convert it to base64
         const imageBase64 = await fetchImageAsBase64(imageUrl);
 
-        // const visionApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+        // Get the user's image from storage
+        const userImageData = await new Promise((resolve) => {
+            chrome.storage.local.get(['userImageBase64'], function (data) {
+                if (data.userImageBase64) {
+                    // Extract base64 data without the prefix
+                    const base64Data = data.userImageBase64.split(',')[1];
+                    resolve(base64Data);
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+
+        // If no user image, return an error
+        if (!userImageData) {
+            console.log("No user image found, asking user to upload an image");
+            throw new Error("Please upload your photo in the extension popup first!");
+        }
+
+        console.log("User image found, using it for virtual try-on");
+
+        // Enhanced prompt for virtual try-on
+        const generationPrompt = `
+        Transfer the face from the second image onto clothing from the first image (a model wearing the outfit). 
+        Make it look natural and realistic, as if the user is wearing the clothing. 
+        Preserve the user’s face, body shape, and pose. 
+        Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
+
         // Now edit the image using Gemini
         const imageGenApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
-
-        // Create prompt for image generation
-        const generationPrompt = `Edit this image into a stylized cartoon version of itself`;
-
-        // Prepare the request payload for image generation
-        const generationPayload = {
-            contents: [{
-                parts: [
-                    { text: generationPrompt },
-                    {
-                        inline_data: {
-                            mime_type: "image/jpeg",
-                            data: imageBase64
-                        }
-                    }
-                ]
-            }],
-            generationConfig: {
-                responseModalities: ["TEXT", "IMAGE"]
-            }
-        };
 
         // // Prepare the request payload for image generation
         // const generationPayload = {
@@ -85,6 +91,30 @@ async function processImageWithGemini(imageUrl) {
         //         responseModalities: ["TEXT", "IMAGE"]
         //     }
         // };
+        // Prepare the request payload with both images
+        const generationPayload = {
+            contents: [{
+                parts: [
+                    { text: generationPrompt },
+                    {
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: imageBase64  // Fashion item image
+                        }
+                    },
+                    {
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: userImageData  // User's image
+                        }
+                    }
+                ]
+            }],
+            generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"]
+            }
+        };
+
 
         // Send the request to Gemini image editing API
         const generationResponse = await fetch(imageGenApiUrl, {
@@ -94,6 +124,7 @@ async function processImageWithGemini(imageUrl) {
             },
             body: JSON.stringify(generationPayload)
         });
+
 
         if (!generationResponse.ok) {
             let errorDetails = `HTTP status ${generationResponse.status}`;
@@ -170,3 +201,5 @@ async function fetchImageAsBase64(imageUrl) {
 }
 
 console.log("Background script loaded and listener added.");
+
+
