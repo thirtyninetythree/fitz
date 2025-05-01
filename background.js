@@ -1,9 +1,31 @@
 // Background script for Steal This Look extension
-// Handles communication with the Gemini API
+// Handles communication with the Gemini API and context menu creation
 
 // Your API key should be stored securely
 // For development, we'll store it here but in production you should use a more secure method
-const GEMINI_API_KEY = "AIzaSyBHYsXx6GJiUSFjamZaNp3KxOgiKQ-BaTQ"; // Replace with your actual API key
+const GEMINI_API_KEY = "AIzaSyBHYsXx6GJiUSFjamZaNp3KxOgiKQ-BaTQ"; 
+const CONTEXT_MENU_ID = "IMAGE_TRY_ON_MENU_ITEM"
+
+// Create context menu item when extension is installed/updated
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.create({
+        id: CONTEXT_MENU_ID,
+        title: "Fit This Look",
+        contexts: ["image"]
+    });
+});
+
+// Context menu click handler
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === CONTEXT_MENU_ID) {
+        // Send message to content script to process the image
+        chrome.tabs.sendMessage(tab.id, {
+            action: "processTryOn",
+            imageUrl: info.srcUrl
+        });
+    }
+});
+
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.action === "sendImageUrlToApi") {
@@ -17,7 +39,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 sendResponse({
                     success: true,
                     data: result,
-                    replacementImageUrl: result.replacementImageUrl
                 });
             })
             .catch(error => {
@@ -30,7 +51,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
         return true; // Indicates you wish to send a response asynchronously
     }
-    // Handle other message actions if needed
 });
 
 /**
@@ -66,31 +86,16 @@ async function processImageWithGemini(imageUrl) {
 
         // Enhanced prompt for virtual try-on
         const generationPrompt = `
-        Transfer the face from the second image onto clothing from the first image (a model wearing the outfit). 
-        Make it look natural and realistic, as if the user is wearing the clothing. 
-        Preserve the user’s face, body shape, and pose. 
-        Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
+        Combine both images in a funny and cartoonish way. 
+        `
+        // Transfer the face from the second image onto clothing from the first image (a model wearing the outfit). 
+        // Make it look natural and realistic, as if the user is wearing the clothing. 
+        // Preserve the user's face, body shape, and pose. 
+        // Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
 
         // Now edit the image using Gemini
         const imageGenApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
 
-        // // Prepare the request payload for image generation
-        // const generationPayload = {
-        //     contents: [{
-        //         parts: [
-        //             { text: generationPrompt },
-        //             {
-        //                 inline_data: {
-        //                     mime_type: "image/jpeg",
-        //                     data: imageBase64
-        //                 }
-        //             }
-        //         ]
-        //     }],
-        //     generationConfig: {
-        //         responseModalities: ["TEXT", "IMAGE"]
-        //     }
-        // };
         // Prepare the request payload with both images
         const generationPayload = {
             contents: [{
@@ -200,6 +205,4 @@ async function fetchImageAsBase64(imageUrl) {
     }
 }
 
-console.log("Background script loaded and listener added.");
-
-
+console.log("Background script loaded with context menu support.");
