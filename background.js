@@ -1,8 +1,7 @@
-// Background script for Steal This Look extension
+// Background script for Fitz extension
 // Handles communication with the Gemini API and context menu creation
 
-// Your API key should be stored securely
-// For development, we'll store it here but in production you should use a more secure method
+//DUMMY API KEY
 const GEMINI_API_KEY = "AIzaSyBHYsXx6GJiUSFjamZaNp3KxOgiKQ-BaTQ"; 
 const CONTEXT_MENU_ID = "IMAGE_TRY_ON_MENU_ITEM"
 
@@ -60,6 +59,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
  */
 async function processImageWithGemini(imageUrl) {
     try {
+        console.log(imageUrl)
         // First, we need to fetch the image and convert it to base64
         const imageBase64 = await fetchImageAsBase64(imageUrl);
 
