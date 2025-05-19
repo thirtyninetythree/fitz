@@ -3,6 +3,7 @@
 
 //DUMMY API KEY
 const GEMINI_API_KEY = "AIzaSyBHYsXx6GJiUSFjamZaNp3KxOgiKQ-BaTQ"; 
+const IMAGE_GEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
 const CONTEXT_MENU_ID = "IMAGE_TRY_ON_MENU_ITEM"
 
 // Create context menu item when extension is installed/updated
@@ -59,7 +60,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
  */
 async function processImageWithGemini(imageUrl) {
     try {
-        console.log(imageUrl)
         // First, we need to fetch the image and convert it to base64
         const imageBase64 = await fetchImageAsBase64(imageUrl);
 
@@ -93,8 +93,7 @@ async function processImageWithGemini(imageUrl) {
         // Preserve the user's face, body shape, and pose. 
         // Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
 
-        // Now edit the image using Gemini
-        const imageGenApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
+
 
         // Prepare the request payload with both images
         const generationPayload = {
@@ -122,7 +121,7 @@ async function processImageWithGemini(imageUrl) {
 
 
         // Send the request to Gemini image editing API
-        const generationResponse = await fetch(imageGenApiUrl, {
+        const generationResponse = await fetch(IMAGE_GEN_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
