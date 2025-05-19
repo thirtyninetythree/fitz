@@ -1,9 +1,15 @@
 // Handles communication with the Gemini API and context menu creation
 
 //DYOUR API KEY GOES HERE
-const GEMINI_API_KEY = ""; 
+const GEMINI_API_KEY = "";
 const IMAGE_GEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
 const CONTEXT_MENU_ID = "IMAGE_TRY_ON_MENU_ITEM"
+const GENERATION_PROMPT = `
+        Transfer the face from the second image onto clothing from the first image (a model wearing the outfit). 
+        Make it look natural and realistic, as if the user is wearing the clothing. 
+        Preserve the user's face, body shape, and pose. 
+        Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
+
 
 // Create context menu item when extension is installed/updated
 chrome.runtime.onInstalled.addListener(() => {
@@ -83,22 +89,11 @@ async function processImageWithGemini(imageUrl) {
 
         console.log("User image found, using it for virtual try-on");
 
-        // Enhanced prompt for virtual try-on
-        const generationPrompt = `
-        Combine both images in a funny and cartoonish way. 
-        `
-        // Transfer the face from the second image onto clothing from the first image (a model wearing the outfit). 
-        // Make it look natural and realistic, as if the user is wearing the clothing. 
-        // Preserve the user's face, body shape, and pose. 
-        // Do not alter any facial features or the overall identity of the user — only the clothing should change.`;
-
-
-
         // Prepare the request payload with both images
         const generationPayload = {
             contents: [{
                 parts: [
-                    { text: generationPrompt },
+                    { text: GENERATION_PROMPT },
                     {
                         inline_data: {
                             mime_type: "image/jpeg",
