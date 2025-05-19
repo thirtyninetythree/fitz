@@ -1,8 +1,7 @@
-// Background script for Fitz extension
 // Handles communication with the Gemini API and context menu creation
 
-//DUMMY API KEY
-const GEMINI_API_KEY = "AIzaSyBHYsXx6GJiUSFjamZaNp3KxOgiKQ-BaTQ"; 
+//DYOUR API KEY GOES HERE
+const GEMINI_API_KEY = ""; 
 const IMAGE_GEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`;
 const CONTEXT_MENU_ID = "IMAGE_TRY_ON_MENU_ITEM"
 
