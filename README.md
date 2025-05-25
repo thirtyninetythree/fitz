@@ -37,3 +37,7 @@ Fork, branch, and PR! Improvements welcome (e.g., options page, better AI prompt
 ## Disclaimer
 
 AI results are for fun/inspiration and may not be perfect.
+
+![fitz](https://github.com/user-attachments/assets/1c7e342b-5b94-4dff-8a2c-9a5da97edda6)
+
+
